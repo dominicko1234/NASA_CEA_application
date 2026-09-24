@@ -249,7 +249,7 @@ class Engine:
     def oxidiser_weights(self) -> np.ndarray:
         return np.array([0.0, 1.0])
 
-    
+
 @dataclass
 class plot_data:
     '''
