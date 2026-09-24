@@ -1,6 +1,6 @@
 # Application of NASA CEA python
 
-This program uses the python interface of NASA CEA to help determine the following parameters for LURA's (Leeds University Rocketry Association) 2026-2027 engine.
+This program uses the python interface of NASA CEA to help determine the following parameters for a rocket engine.
 
 Parameters:
 
