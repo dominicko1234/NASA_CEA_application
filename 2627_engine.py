@@ -4,6 +4,7 @@ import pandas as pd
 import cea
 from dataclasses import dataclass, replace
 
+# From https://nasa.github.io/cea/ example 8
 def cea_print_full(solution: cea.RocketSolution) -> None:
     '''
     Print cea solution in NASA CEA format
