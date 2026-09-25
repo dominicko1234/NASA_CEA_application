@@ -481,7 +481,7 @@ def gen_graphs(engine_config: Engine, target_thrust: int | float) -> None:
     # plot all
     plot_graph([Pc_temp_group1, OF_mdot_group1, Pc_isp_group1, OF_c_star_group1])
 
-def max_thrust_from_max_OD(OD_array: list[int | float], OF_array: list[int | float], chamber_pressure_array: list[int | float], engine_config: Engine, plot_all_on_same_graph: bool=False) -> list[tuple[float, float]]:
+def max_thrust_from_max_OD(OD_array: list[int | float], OF_array: list[int | float], chamber_pressure_array: list[int | float], engine_config: Engine, plot_all_on_same_graph: bool=False) -> list[tuple]:
     '''
     calculate max thrust using max OD
     OD_array: array of Outer Diameter in metres
@@ -504,23 +504,24 @@ def max_thrust_from_max_OD(OD_array: list[int | float], OF_array: list[int | flo
                 throat_area = ae / expansion_ratio
                 thrust = thrust_coefficient * pc * throat_area * 1e5
                 thrust_array.append(thrust/1000)
-                if mr > 3.5 and mr < 3.6:
-                    print(thrust_coefficient)
-                    print(expansion_ratio)
-                    print(thrust)
+                # if mr > 3.5 and mr < 3.6:
+                #     print(thrust_coefficient)
+                #     print(expansion_ratio)
+                #     print(thrust)
             plot_list.append(plot_data(OF_array, thrust_array, "OF ratio", "Thrust (kN)", f"OD: {OD_array[i] * 1000} mm, chamber pressure: {pc} bar"))
             max_thrust = max(thrust_array)
             max_thrust_OF_index = OF_array[thrust_array.index(max_thrust)]
-            output_list.append((pc, max_thrust, max_thrust_OF_index))
+            output_list.append((pc, OD_array[i], max_thrust, max_thrust_OF_index))
+
         if not plot_all_on_same_graph:
             group_list.append(group_plot_data(plot_list, f"Thrust against OF ratio for different max OD, chamber pressure = {pc} bar", "OF ratio", "Thrust (kN)"))
             plot_list = []
-        
+
     # plot
     if not plot_all_on_same_graph:
         plot_graph(data=group_list)
     elif plot_all_on_same_graph:
-        plot_graph(data=[group_plot_data(plot_list, f"Thrust against OF ratio for different max OD", "OF ratio", "Thrust (kN)")])
+        plot_graph(data=[group_plot_data(plot_list, f"Thrust against OF ratio for different max OD", "OF ratio", "Thrust (kN)")])    
     return output_list
 
 def main() -> None:
@@ -537,8 +538,19 @@ def main() -> None:
     print(G4)
     OD_array = [0.1524, 0.2032]  # 6", 8" in m
     OF_array: list[int | float] = list(np.arange(1, 8.1, 0.1))
-    chamber_pressure_array: list[int | float] = [20, 25, 30, 35, 40]
+    chamber_pressure_array: list[int | float] = list(range(20, 41))
     x = max_thrust_from_max_OD(OD_array, OF_array, chamber_pressure_array, G4, True)
+    print(x)
+    # group_list = []
+    # for d in OD_array:
+    #     y_list = []
+    #     x_list = []
+    #     for i in x:
+    #         if i[1] == d:
+    #             y_list.append(i[2])
+    #             x_list.append(i[0])
+    #     group_list.append(plot_data(x_list, y_list, "Chamber pressure", "Thrust (kN)", f"Max thrust against chamber pressure for OD={d*1000} mm"))
+    # plot_graph(data=group_list)
     # cea_print_full(cea_rocket_solver(G4))
     
 if __name__ == "__main__":
