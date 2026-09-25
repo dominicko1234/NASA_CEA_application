@@ -538,8 +538,8 @@ def main() -> None:
     print(G4)
     OD_array = [0.1524, 0.2032]  # 6", 8" in m
     OF_array: list[int | float] = list(np.arange(1, 8.1, 0.1))
-    chamber_pressure_array: list[int | float] = list(range(20, 41))
-    x = max_thrust_from_max_OD(OD_array, OF_array, chamber_pressure_array, G4, True)
+    chamber_pressure_array: list[int | float] = [20, 25, 30, 35, 40]
+    x = max_thrust_from_max_OD(OD_array, OF_array, chamber_pressure_array, G4)
     print(x)
     # group_list = []
     # for d in OD_array:
