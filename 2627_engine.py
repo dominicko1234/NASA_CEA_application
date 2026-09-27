@@ -534,7 +534,7 @@ def main() -> None:
     ambient_pressure  = 1.01325  # bar
     target_thrust = 8 # kN
     G4 = Engine(fuel, oxidiser, OF_ratio, chamber_pressure, ambient_pressure, fuel_temp, oxidiser_temp)
-    # gen_graphs(G4, target_thrust)
+    gen_graphs(G4, target_thrust)
     print(G4)
     OD_array = [0.1524, 0.2032]  # 6", 8" in m
     OF_array: list[int | float] = list(np.arange(1, 8.1, 0.1))
