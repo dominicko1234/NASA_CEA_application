@@ -71,7 +71,7 @@ class EnginePerformance:
             engine_config = self.change_engine_config_parameter(parameter, value, self.engine)
             solution = NASA_CEA().cea_rocket_solver(engine_config)
             y_list.append(self.calc_isp(solution.Isp[2]))
-        return PlotData(values, y_list, f"{parameter} {parameter.value}", "Isp (s)", f"ISP VS {parameter.name}, {self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
+        return PlotData(values, y_list, f"{parameter} {parameter.value}", "Isp (s)", f"{self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
 
     def get_c_star(self, parameter: Parameters, values: list[float]) -> PlotData:
         '''
@@ -84,7 +84,7 @@ class EnginePerformance:
             engine_config = self.change_engine_config_parameter(parameter, value, self.engine)
             solution = NASA_CEA().cea_rocket_solver(engine_config)
             y_list.append(solution.c_star[2])
-        return PlotData(values, y_list, f"{parameter} {parameter.value}", "C* (m/s)", f"C* VS {parameter.name}, {self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
+        return PlotData(values, y_list, f"{parameter} {parameter.value}", "C* (m/s)", f"{self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
 
     def get_temperature(self, parameter: Parameters, values: list[float]) -> PlotData:
         '''
@@ -97,7 +97,7 @@ class EnginePerformance:
             engine_config = self.change_engine_config_parameter(parameter, value, self.engine)
             solution = NASA_CEA().cea_rocket_solver(engine_config)
             y_list.append(solution.T[2]) 
-        return PlotData(values, y_list, f"{parameter} {parameter.value}", "Combustion temperature (K)", f"TEMPERATURE VS {parameter.name}, {self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
+        return PlotData(values, y_list, f"{parameter} {parameter.value}", "Combustion temperature (K)", f"{self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
 
 def pc_and_mr_effect(pc_array: list[float], mr_array: list[float], engine_config: Engine) -> None:
     '''
@@ -133,7 +133,7 @@ def main() -> None:
         ambient_pressure  = 1.01325  # bar
     )
     mr_array: list[float] = list(np.arange(1, 8.1, 0.1))
-    pc_array = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0]
+    pc_array = [30.0, 35.0, 40.0, 45.0]
     pc_and_mr_effect(pc_array, mr_array, R2S_ENGINE)
 
 if __name__ == "__main__":
