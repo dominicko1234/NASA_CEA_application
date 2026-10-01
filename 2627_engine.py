@@ -360,6 +360,7 @@ def get_temperature_from_OF(OF_ratio_array: list[float | int], engine_config: En
         solution = cea_rocket_solver(new_config)
         t_1 = solution.T[0]
         temp_list.append(t_1)
+    print(f"Max temp: {max(temp_list)} K @ OF = {OF_ratio_array[temp_list.index(max(temp_list))]}")
     return plot_data(OF_ratio_array, temp_list, "OF ratio", "Combustion temperature (K)", f"{engine_config.fuel}/{engine_config.oxidiser}, {engine_config.chamber_pressure} bar")
 
 def get_isp_from_OF(OF_ratio_array: list[float | int], engine_config: Engine) -> plot_data:
@@ -374,6 +375,7 @@ def get_isp_from_OF(OF_ratio_array: list[float | int], engine_config: Engine) ->
         solution = cea_rocket_solver(new_config)
         c = solution.Isp[2]
         isp_array.append(calc_isp(c))
+    print(f"Max ISP: {max(isp_array)} @ OF = {OF_ratio_array[isp_array.index(max(isp_array))]}")
     return plot_data(OF_ratio_array, isp_array, "OF ratio", "Isp (s)", f"{engine_config.fuel}/{engine_config.oxidiser}, {engine_config.chamber_pressure} bar")
 
 def get_mdot_from_OF(OF_ratio_array: list[float | int], target_thrust: float | int, engine_config: Engine) -> plot_data:
@@ -403,6 +405,7 @@ def get_c_star_from_OF(OF_ratio_array: list[float | int], engine_config: Engine)
         solution = cea_rocket_solver(new_config)
         c_star = solution.c_star[2]
         c_star_array.append(c_star)
+    print(f"Max C*: {max(c_star_array)} @ OF = {OF_ratio_array[c_star_array.index(max(c_star_array))]}")
     return plot_data(OF_ratio_array, c_star_array, "OF ratio", "Characteristic velocity (m/s)", f"{engine_config.fuel}/{engine_config.oxidiser}, {engine_config.chamber_pressure} bar")
 
 def plot_graph(data: list[plot_data | group_plot_data]) -> None:
@@ -456,7 +459,6 @@ def gen_graphs(engine_config: Engine, target_thrust: int | float) -> None:
         new_config = replace(engine_config, chamber_pressure=pc)
         plot_list.append(get_temperature_from_OF(OF_ratio_array, new_config))
     Pc_temp_group1 = group_plot_data(plot_list, "OF ratio effect on temperature for different chamber pressures", "OF ratio", "Combustion temperature (K)")
-
     # OF and mdot
     plot_list = []
     for pc in chamber_pressure_array:
@@ -526,9 +528,11 @@ def max_thrust_from_max_OD(OD_array: list[int | float], OF_array: list[int | flo
 
 def main() -> None:
     fuel = "C3H8O,2propanol"
-    oxidiser = "N2O"
+    # oxidiser = "N2O"
+    oxidiser = "O2(L)"
     fuel_temp = 298.15  # K
-    oxidiser_temp = 338.15  # K
+    # oxidiser_temp = 338.15  # K
+    oxidiser_temp = 50  # K
     OF_ratio = 3.5
     chamber_pressure = 20  # bar
     ambient_pressure  = 1.01325  # bar
