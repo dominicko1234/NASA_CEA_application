@@ -2,3 +2,4 @@ cea
 pandas
 matplotlib
 coolprop
+numpy

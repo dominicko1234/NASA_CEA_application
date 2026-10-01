@@ -28,5 +28,5 @@ pip3 install -r requirements.txt
 In the same directory as virtual environment, run the following command in terminal or cmd to run the main program
 
 ```
-python3 2627engine.py
+python3 main.py
 ```
