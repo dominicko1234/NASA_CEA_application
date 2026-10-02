@@ -5,13 +5,22 @@ from plotter import Plotter, PlotData
 from enum import Enum
 from dataclasses import replace
 import matplotlib.pyplot as plt
+import cea
 
 class Parameters(Enum):
     '''
-    returns parameter name = (unit)
+    returns engine parameter name = (unit)
     '''
     MIXTURE_RATIO = ""
     CHAMBER_PRESSURE = "(bar)"
+
+class Performance_Parameters(Enum):
+    '''
+    returns performance engine parameter name = (unit)
+    '''
+    COMBUSTION_TEMPERATUE = "(K)"
+    ISP = "(s)"
+    C_STAR = "(m/s)"
 
 class EnginePerformance:
     def __init__(self, engine: Engine) -> None:
@@ -40,12 +49,41 @@ class EnginePerformance:
         get title independent variable for graph depending on paramter
         parameter: independent variable
         '''
-        if parameter.name == "MIXTURE_RATIO":
+        if parameter == Parameters.MIXTURE_RATIO:
             return f"CHAMBER_PRESSURE = {engine_config.chamber_pressure}"
-        elif parameter.name == "CHAMBER_PRESSURE":
+        elif parameter == Parameters.CHAMBER_PRESSURE:
             return f"MIXTURE_RATIO = {engine_config.OF_ratio}"
         else:
             return ""
+
+    def get_performance_data(self, engine_config: Engine = None) -> dict[Performance_Parameters, float]:  # type: ignore
+        '''
+        get isp, c* and temp data from rocket_solution
+        rocket_solution: cea rocket solution for Engine()
+        engine_config: Engine() object, default = self.engine
+        '''
+        if engine_config is None:
+            engine_config = self.engine
+        rocket_solution = NASA_CEA().cea_rocket_solver(engine_config)
+        return {Performance_Parameters.ISP: self.calc_isp(rocket_solution.Isp[2]), 
+                Performance_Parameters.C_STAR: rocket_solution.c_star[2], 
+                Performance_Parameters.COMBUSTION_TEMPERATUE: rocket_solution.T[2]}
+
+    def get_performance_parameter_plot_data(self, performance_parameter: Performance_Parameters, x_parameter: Parameters, x_list: list[float], y_list: list[float]) -> PlotData:
+        '''
+        get plot data object for each performance parameter (isp, c*, temp)
+        performance_parameter: engine performance parameter (y axis data) (isp, c*, temp)
+        x_paremeter: independent variable (x axis data) (chamber pressure, mixture ratio)
+        x_list: x data list
+        y_list: y data list
+        '''
+        if performance_parameter != Performance_Parameters.ISP and performance_parameter != Performance_Parameters.COMBUSTION_TEMPERATUE and performance_parameter != Performance_Parameters.C_STAR:
+            raise Exception(f"Invalid performance parameter {performance_parameter}")
+        if x_parameter != Parameters.CHAMBER_PRESSURE and x_parameter != Parameters.MIXTURE_RATIO:
+            raise Exception(f"Invalid engine parameter {x_parameter}")
+        return PlotData(x_list, y_list, x_label=f"{x_parameter.name} {x_parameter.value}", 
+                y_label=f"{performance_parameter.name} {performance_parameter.value}", 
+                title=f"{self.get_title_independent_variable(x_parameter, self.engine)} {self.engine.fuel}/{self.engine.oxidiser}")
 
     def change_engine_config_parameter(self, parameter: Parameters, value: int | float,  engine_config: Engine) -> Engine:
         '''
@@ -54,50 +92,45 @@ class EnginePerformance:
         value: new value to replace
         engine_config: Engine object
         '''
-        if parameter.name == "MIXTURE_RATIO":
+        if parameter == Parameters.MIXTURE_RATIO:
             engine_config = replace(self.engine, OF_ratio=value)
-        elif parameter.name == "CHAMBER_PRESSURE":
+        elif parameter == Parameters.CHAMBER_PRESSURE:
             engine_config = replace(self.engine, chamber_pressure=value)
         return engine_config
-    
-    def get_isp(self, parameter: Parameters, values: list[float]) -> PlotData:
-        '''
-        get isp values from paramter array
-        parameter: independent variable = mr, pc
-        values: array for paramter
-        '''
-        y_list = []
-        for value in values:
-            engine_config = self.change_engine_config_parameter(parameter, value, self.engine)
-            solution = NASA_CEA().cea_rocket_solver(engine_config)
-            y_list.append(self.calc_isp(solution.Isp[2]))
-        return PlotData(values, y_list, f"{parameter} {parameter.value}", "Isp (s)", f"{self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
 
-    def get_c_star(self, parameter: Parameters, values: list[float]) -> PlotData:
+    def get_performance_plot_data_dict(self, parameter: Parameters, values: list[float]) -> dict[Performance_Parameters, PlotData]:
         '''
-        get c* values from parameter array
-        parameter: independent variable = mr, pc
-        values: array for paramter
+        get PlotData object for all performance parameters(isp, c*, temp) to plot on a graph
         '''
-        y_list = []
-        for value in values:
-            engine_config = self.change_engine_config_parameter(parameter, value, self.engine)
-            solution = NASA_CEA().cea_rocket_solver(engine_config)
-            y_list.append(solution.c_star[2])
-        return PlotData(values, y_list, f"{parameter} {parameter.value}", "C* (m/s)", f"{self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
+        temp_y_list = []
+        isp_y_list = []
+        c_star_y_list = []
+        for v in values:
+            engine_config = self.change_engine_config_parameter(parameter, v, self.engine)
+            results = self.get_performance_data(engine_config=engine_config)
+            temp_y_list.append(results[Performance_Parameters.COMBUSTION_TEMPERATUE])
+            isp_y_list.append(results[Performance_Parameters.ISP])
+            c_star_y_list.append(results[Performance_Parameters.C_STAR])
+        temp_plot_data = self.get_performance_parameter_plot_data(
+                        performance_parameter=Performance_Parameters.COMBUSTION_TEMPERATUE, 
+                        x_parameter=parameter,
+                        x_list = values,
+                        y_list = temp_y_list)
+        isp_plot_data = self.get_performance_parameter_plot_data(
+                        performance_parameter=Performance_Parameters.ISP, 
+                        x_parameter=parameter,
+                        x_list = values,
+                        y_list = isp_y_list)
+        c_star_plot_data = self.get_performance_parameter_plot_data(
+                        performance_parameter=Performance_Parameters.C_STAR, 
+                        x_parameter=parameter,
+                        x_list = values,
+                        y_list = c_star_y_list)
+        return {
+            Performance_Parameters.COMBUSTION_TEMPERATUE: temp_plot_data,
+            Performance_Parameters.ISP: isp_plot_data,
+            Performance_Parameters.C_STAR: c_star_plot_data}
 
-    def get_temperature(self, parameter: Parameters, values: list[float]) -> PlotData:
-        '''
-        get temperature values from parameter array
-        parameter: independent variable = mr, pc
-        values: array for paramter
-        '''
-        y_list = []
-        for value in values:
-            engine_config = self.change_engine_config_parameter(parameter, value, self.engine)
-            solution = NASA_CEA().cea_rocket_solver(engine_config)
-            y_list.append(solution.T[2]) 
-        return PlotData(values, y_list, f"{parameter} {parameter.value}", "Combustion temperature (K)", f"{self.get_title_independent_variable(parameter, engine_config)}, {engine_config.oxidiser}/{engine_config.fuel}")
 
 def pc_and_mr_effect(pc_array: list[float], mr_array: list[float], engine_config: Engine) -> None:
     '''
@@ -106,15 +139,17 @@ def pc_and_mr_effect(pc_array: list[float], mr_array: list[float], engine_config
     mr_array: OF ratio array
     engine_config: Engine object
     '''
-    temp_list: list[PlotData] = []  # temperature list
-    isp_list: list[PlotData] = []  # isp list
-    c_star_list: list[PlotData] = []  # c* list
+    temp_list: list[PlotData] = []  # temperature PlotData list
+    isp_list: list[PlotData] = []  # isp PlotData list
+    c_star_list: list[PlotData] = []  # c* PlotData list
     for pc in pc_array:
-        new_config = replace(engine_config, chamber_pressure = pc)  # replace pc value
+        new_config = replace(engine_config, chamber_pressure = pc)  # replace pc and mr value
         performance = EnginePerformance(new_config)
-        temp_list.append(performance.get_temperature(Parameters.MIXTURE_RATIO, mr_array))  # append temp line data to list
-        isp_list.append(performance.get_isp(Parameters.MIXTURE_RATIO, mr_array))  # append isp line data to list
-        c_star_list.append(performance.get_c_star(Parameters.MIXTURE_RATIO, mr_array))  # append c* line data to list
+        results = performance.get_performance_plot_data_dict(Parameters.MIXTURE_RATIO, mr_array)
+        temp_list.append(results[Performance_Parameters.COMBUSTION_TEMPERATUE])  # append temp line data to list
+        isp_list.append(results[Performance_Parameters.ISP])  # append isp line data to list
+        c_star_list.append(results[Performance_Parameters.C_STAR])  # append c* line data to list
+
     P = Plotter()
     temp_fig = P.plot_multiple(temp_list, "Temperature vs OF ratio for different chamber pressures", "OF ratio", "Temperature (K)")  # plot temperatures
     isp_fig = P.plot_multiple(isp_list, "Isp vs OF ratio for different chamber pressures", "OF ratio", "Isp (s)")  # plot isp

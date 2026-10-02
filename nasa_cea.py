@@ -27,6 +27,7 @@ class NASA_CEA:
         # return cea solution
         return solution
 
+    # From https://nasa.github.io/cea/ example 8
     def cea_print_full(self, solution: cea.RocketSolution) -> None:
         '''
         Print cea solution in NASA CEA format
