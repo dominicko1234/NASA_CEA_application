@@ -9,22 +9,41 @@ Parameters:
 
 ## Installation
 
-Create a new virtual environment
+1. Clone repository
+   ```bash
+   git clone https://github.com/username/project-name.git
+   cd project-name
+   ```
+2. Create a new virtual environment
 
-```
-python3 -m venv .venv
-```
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
 
-Install required libraries using the following command
+3. Install dependencies
 
-```
-pip3 install -r requirements.txt
-```
+   ```
+   pip3 install -r requirements.txt
+   ```
 
-## Run program
+## Usage
 
-In the same directory as virtual environment, run the following command in terminal or cmd to run the main program
+Plotting graphs of Specific impulse, Characteristic velocity, Combustion temperature (isp, c\*, temp) against Mixture ratio, for different chamber pressures
 
-```
-python3 main.py
+```python
+from engine import Engine
+from main import pc_and_mr_effect
+
+# Example
+engine = Engine(
+    fuel = "C3H8O,2propanol",
+    oxidiser = "O2(L)",
+    fuel_temp = 298.15,
+    ...
+)
+mixture_ratio_array = [0.5, 1.0, 1.5, 2.0]
+chamber_pressure_array = [10, 15, 20, 25, 30]
+pc_and_mr_effect(mixture_ratio_array, chamber_pressure_array, engine)
+plt.show()
 ```
