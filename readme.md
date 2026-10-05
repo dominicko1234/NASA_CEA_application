@@ -12,10 +12,8 @@ Parameters:
 Create a new virtual environment
 
 ```
-python3 -m venv {virtual_environment_name}
+python3 -m venv .venv
 ```
-
-- {virtual_environment_name} is the custom name for the virtual environment and can be any name
 
 Install required libraries using the following command
 
