@@ -56,7 +56,7 @@ class EnginePerformance:
         else:
             return ""
 
-    def get_performance_data(self, engine_config: Engine = None) -> dict[Performance_Parameters, float]:  # type: ignore
+    def get_performance_data(self, engine_config: Engine | None = None) -> dict[Performance_Parameters, float]:
         '''
         get isp, c* and temp data from rocket_solution
         rocket_solution: cea rocket solution for Engine()
@@ -111,6 +111,10 @@ class EnginePerformance:
             temp_y_list.append(results[Performance_Parameters.COMBUSTION_TEMPERATUE])
             isp_y_list.append(results[Performance_Parameters.ISP])
             c_star_y_list.append(results[Performance_Parameters.C_STAR])
+        print(self.get_title_independent_variable(parameter, self.engine))
+        print(f"max temp {max(temp_y_list)} @ {values[temp_y_list.index(max(temp_y_list))]}")
+        print(f"max isp {max(isp_y_list)} @ {values[isp_y_list.index(max(isp_y_list))]}")
+        print(f"max c* {max(c_star_y_list)} @ {values[c_star_y_list.index(max(c_star_y_list))]}")
         temp_plot_data = self.get_performance_parameter_plot_data(
                         performance_parameter=Performance_Parameters.COMBUSTION_TEMPERATUE, 
                         x_parameter=parameter,
@@ -149,7 +153,6 @@ def pc_and_mr_effect(pc_array: list[float], mr_array: list[float], engine_config
         temp_list.append(results[Performance_Parameters.COMBUSTION_TEMPERATUE])  # append temp line data to list
         isp_list.append(results[Performance_Parameters.ISP])  # append isp line data to list
         c_star_list.append(results[Performance_Parameters.C_STAR])  # append c* line data to list
-
     P = Plotter()
     temp_fig = P.plot_multiple(temp_list, "Temperature vs OF ratio for different chamber pressures", "OF ratio", "Temperature (K)")  # plot temperatures
     isp_fig = P.plot_multiple(isp_list, "Isp vs OF ratio for different chamber pressures", "OF ratio", "Isp (s)")  # plot isp
@@ -165,10 +168,11 @@ def main() -> None:
         oxidiser_temp = 50,  # K
         OF_ratio = 3.5,
         chamber_pressure = 20,  # bar
-        ambient_pressure  = 1.01325  # bar
+        ambient_pressure  = 1.01325,  # bar
+        target_thrust = 10  # kN
     )
     mr_array: list[float] = list(np.arange(1, 8.1, 0.1))
-    pc_array = [30.0, 35.0, 40.0, 45.0]
+    pc_array = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0]
     pc_and_mr_effect(pc_array, mr_array, R2S_ENGINE)
 
 if __name__ == "__main__":

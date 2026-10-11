@@ -14,6 +14,7 @@ class Engine:
     ambient_presssure: atomspheric pressure at operation altitude in bar
     fuel_temp: fuel temperature in K
     oxidiser_temp: oxidiser temperature in K
+    target_thrust: engine target thrust in kN
     '''
     fuel: str
     oxidiser: str
@@ -22,6 +23,7 @@ class Engine:
     ambient_pressure: int | float
     fuel_temp: int | float
     oxidiser_temp: int | float
+    target_thrust: int | float
 
     @property
     def propellants(self) -> list[str | cea.Reactant]:
