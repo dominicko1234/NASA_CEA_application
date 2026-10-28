@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib.axes import _axes  # type(ax) in fig, ax = plt.subplots()
 from matplotlib.figure import Figure  # type(fig) in fig, ax = plt.subplots()
 
+
 @dataclass
 class PlotData:
     '''
@@ -21,12 +22,14 @@ class PlotData:
     title: str
 
 class Plotter:
+    FIG_SIZE = (12, 8)  # fig size 
+
     def plot_one(self, line_data: PlotData) -> Figure:
         '''
         Plot one line on graph
         line_data: PlotData object
         '''
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=self.FIG_SIZE)
         ax.plot(line_data.x, line_data.y)
         self.configure_plot(ax, line_data.x_label, line_data.y_label, line_data.title)
         return fig
@@ -39,7 +42,7 @@ class Plotter:
         x_label: x axis label
         y_label: y axis label
         '''
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=self.FIG_SIZE)
         for line in data:
             ax.plot(line.x, line.y, label=line.title)
         self.configure_plot(ax, x_label, y_label, title)
@@ -58,3 +61,11 @@ class Plotter:
         ax.set_ylabel(y_label)
         ax.set_title(title)
         ax.grid()
+
+if __name__ == "__main__":
+    x = [0,1,2,3,4,5,6,7,8,9,10]
+    y = [0,1,2,3,4,5,6,7,8,9,10]
+    line = PlotData(x, y, "x", "y", "")  # type: ignore
+    
+    Plotter().plot_one(line)
+    plt.show()

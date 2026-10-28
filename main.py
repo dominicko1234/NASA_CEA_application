@@ -165,14 +165,16 @@ def main() -> None:
         fuel = "C3H8O,2propanol",
         oxidiser = "O2(L)",  # LOX
         fuel_temp = 298.15,  # K
-        oxidiser_temp = 50,  # K
-        OF_ratio = 3.5,
-        chamber_pressure = 20,  # bar
+        oxidiser_temp = 90,  # K
+        OF_ratio = 1.5,
+        chamber_pressure = 30,  # bar
         ambient_pressure  = 1.01325,  # bar
         target_thrust = 10  # kN
     )
+    # NASA_CEA().cea_print_full(NASA_CEA().cea_rocket_solver(R2S_ENGINE))
+
     mr_array: list[float] = list(np.arange(1, 8.1, 0.1))
-    pc_array = [20.0, 25.0, 30.0, 35.0, 40.0, 45.0]
+    pc_array = [20.0, 25.0, 30.0, 35.0, 40.0]
     pc_and_mr_effect(pc_array, mr_array, R2S_ENGINE)
 
 if __name__ == "__main__":
