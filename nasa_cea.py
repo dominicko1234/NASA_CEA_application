@@ -172,64 +172,64 @@ class NASA_CEA:
         print("PERFORMANCE PARAMETERS")
         print()
 
-        print("Ae/At          ", end=" ")
-        for i in range(num_pts):
-            if i < num_pts-1:
-                print("{0:10.3f}".format(ae_at[i]), end=" ")
-            else:
-                print("{0:10.3f}".format(ae_at[i]))
-
-        print("C*, m/s        ", end=" ")
-        for i in range(num_pts):
-            if i < num_pts-1:
-                print("{0:10.2f}".format(c_star[i]), end=" ")
-            else:
-                print("{0:10.2f}".format(c_star[i]))
-
-        print("Cf             ", end=" ")
-        for i in range(num_pts):
-            if i < num_pts-1:
-                print("{0:10.4f}".format(Cf[i]), end=" ")
-            else:
-                print("{0:10.4f}".format(Cf[i]))
-
-        print("Isp, vac., m/s ", end=" ")
-        for i in range(num_pts):
-            if i < num_pts-1:
-                print("{0:10.3f}".format(Isp_vac[i]), end=" ")
-            else:
-                print("{0:10.3f}".format(Isp_vac[i]))
-
-        print("Isp, m/s       ", end=" ")
-        for i in range(num_pts):
-            if i < num_pts-1:
-                print("{0:10.3f}".format(Isp[i]), end=" ")
-            else:
-                print("{0:10.3f}".format(Isp[i]))
-
-        print()
-        print("MOLE FRACTIONS")
-        print("")
-        trace_species = []
-        for prod in solution.mole_fractions:
-            if np.any(solution.mole_fractions[prod] > 5e-6):
-                print("{0:15s}".format(prod), end=" ")
-                for j in range(len(solution.mole_fractions[prod])):
-                    if j < len(solution.mole_fractions[prod])-1:
-                        print("{0:10.5g}".format(
-                            solution.mole_fractions[prod][j]), end=" ")
-                    else:
-                        print("{0:10.5g}".format(solution.mole_fractions[prod][j]))
-            else:
-                trace_species.append(prod)
-
-        print()
-        print("TRACE SPECIES:")
-        max_cols = 8
-        nrows = (len(trace_species) + max_cols - 1) // max_cols
-        for i in range(nrows):
-            print(" ".join("{0:15s}".format(trace_species[j]) for j in range(
-                i * max_cols, min((i + 1) * max_cols, len(trace_species)))))
+        # print("Ae/At          ", end=" ")
+        # for i in range(num_pts):
+        #     if i < num_pts-1:
+        #         print("{0:10.3f}".format(ae_at[i]), end=" ")
+        #     else:
+        #         print("{0:10.3f}".format(ae_at[i]))
+        #
+        # print("C*, m/s        ", end=" ")
+        # for i in range(num_pts):
+        #     if i < num_pts-1:
+        #         print("{0:10.2f}".format(c_star[i]), end=" ")
+        #     else:
+        #         print("{0:10.2f}".format(c_star[i]))
+        #
+        # print("Cf             ", end=" ")
+        # for i in range(num_pts):
+        #     if i < num_pts-1:
+        #         print("{0:10.4f}".format(Cf[i]), end=" ")
+        #     else:
+        #         print("{0:10.4f}".format(Cf[i]))
+        #
+        # print("Isp, vac., m/s ", end=" ")
+        # for i in range(num_pts):
+        #     if i < num_pts-1:
+        #         print("{0:10.3f}".format(Isp_vac[i]), end=" ")
+        #     else:
+        #         print("{0:10.3f}".format(Isp_vac[i]))
+        #
+        # print("Isp, m/s       ", end=" ")
+        # for i in range(num_pts):
+        #     if i < num_pts-1:
+        #         print("{0:10.3f}".format(Isp[i]), end=" ")
+        #     else:
+        #         print("{0:10.3f}".format(Isp[i]))
+        #
+        # print()
+        # print("MOLE FRACTIONS")
+        # print("")
+        # trace_species = []
+        # for prod in solution.mole_fractions:
+        #     if np.any(solution.mole_fractions[prod] > 5e-6):
+        #         print("{0:15s}".format(prod), end=" ")
+        #         for j in range(len(solution.mole_fractions[prod])):
+        #             if j < len(solution.mole_fractions[prod])-1:
+        #                 print("{0:10.5g}".format(
+        #                     solution.mole_fractions[prod][j]), end=" ")
+        #             else:
+        #                 print("{0:10.5g}".format(solution.mole_fractions[prod][j]))
+        #     else:
+        #         trace_species.append(prod)
+        #
+        # print()
+        # print("TRACE SPECIES:")
+        # max_cols = 8
+        # nrows = (len(trace_species) + max_cols - 1) // max_cols
+        # for i in range(nrows):
+        #     print(" ".join("{0:15s}".format(trace_species[j]) for j in range(
+        #         i * max_cols, min((i + 1) * max_cols, len(trace_species)))))
 
 if __name__ == "__main__":
     pass

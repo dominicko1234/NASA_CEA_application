@@ -1,11 +1,14 @@
+from dataclasses import replace
+from enum import Enum
+
+import matplotlib.pyplot as plt
 import numpy as np
+
 from engine import Engine
 from nasa_cea import NASA_CEA
-from plotter import Plotter, PlotData
-from enum import Enum
-from dataclasses import replace
-import matplotlib.pyplot as plt
-import cea
+import nasa_cea
+from plotter import PlotData, Plotter
+
 
 class Parameters(Enum):
     '''
@@ -65,9 +68,10 @@ class EnginePerformance:
         if engine_config is None:
             engine_config = self.engine
         rocket_solution = NASA_CEA().cea_rocket_solver(engine_config)
+        # NASA_CEA().cea_print_full(rocket_solution)
         return {Performance_Parameters.ISP: self.calc_isp(rocket_solution.Isp[2]), 
-                Performance_Parameters.C_STAR: rocket_solution.c_star[2], 
-                Performance_Parameters.COMBUSTION_TEMPERATUE: rocket_solution.T[2]}
+                Performance_Parameters.C_STAR: rocket_solution.c_star[0], 
+                Performance_Parameters.COMBUSTION_TEMPERATUE: rocket_solution.T[0]}
 
     def get_performance_parameter_plot_data(self, performance_parameter: Performance_Parameters, x_parameter: Parameters, x_list: list[float], y_list: list[float]) -> PlotData:
         '''
@@ -78,14 +82,14 @@ class EnginePerformance:
         y_list: y data list
         '''
         if performance_parameter != Performance_Parameters.ISP and performance_parameter != Performance_Parameters.COMBUSTION_TEMPERATUE and performance_parameter != Performance_Parameters.C_STAR:
-            raise Exception(f"Invalid performance parameter {performance_parameter}")
+            raise Exception(f"Invalid performance parameter {performance_parameter}")  # noqa: TRY002
         if x_parameter != Parameters.CHAMBER_PRESSURE and x_parameter != Parameters.MIXTURE_RATIO:
-            raise Exception(f"Invalid engine parameter {x_parameter}")
+            raise Exception(f"Invalid engine parameter {x_parameter}")  # noqa: TRY002
         return PlotData(x_list, y_list, x_label=f"{x_parameter.name} {x_parameter.value}", 
                 y_label=f"{performance_parameter.name} {performance_parameter.value}", 
                 title=f"{self.get_title_independent_variable(x_parameter, self.engine)} {self.engine.fuel}/{self.engine.oxidiser}")
 
-    def change_engine_config_parameter(self, parameter: Parameters, value: int | float,  engine_config: Engine) -> Engine:
+    def change_engine_config_parameter(self, parameter: Parameters, value: float,  engine_config: Engine) -> Engine:
         '''
         change value of parameter in engine configuration
         parameter: independent variable
@@ -154,10 +158,13 @@ def pc_and_mr_effect(pc_array: list[float], mr_array: list[float], engine_config
         isp_list.append(results[Performance_Parameters.ISP])  # append isp line data to list
         c_star_list.append(results[Performance_Parameters.C_STAR])  # append c* line data to list
     P = Plotter()
-    temp_fig = P.plot_multiple(temp_list, "Temperature vs OF ratio for different chamber pressures", "OF ratio", "Temperature (K)")  # plot temperatures
-    isp_fig = P.plot_multiple(isp_list, "Isp vs OF ratio for different chamber pressures", "OF ratio", "Isp (s)")  # plot isp
-    c_star_fig = P.plot_multiple(c_star_list, "C* vs OF ratio for different chamber pressures", "OF ratio", "C* (m/s)")  # plot c*
-    plt.show()
+    temp_fig = P.plot_multiple(temp_list, "Temperature vs OF ratio for different chamber pressures", 
+                               "OF ratio", "Temperature (K)")  # plot temperatures
+    isp_fig = P.plot_multiple(isp_list, "Isp vs OF ratio for different chamber pressures",
+                              "OF ratio", "Isp (s)")  # plot isp
+    c_star_fig = P.plot_multiple(c_star_list, "C* vs OF ratio for different chamber pressures",
+                                 "OF ratio", "C* (m/s)")  # plot c* 
+    # plt.show()
 
 
 def main() -> None:
@@ -167,15 +174,15 @@ def main() -> None:
         fuel_temp = 298.15,  # K
         oxidiser_temp = 90,  # K
         OF_ratio = 1.5,
-        chamber_pressure = 30,  # bar
+        chamber_pressure = 35,  # bar
         ambient_pressure  = 1.01325,  # bar
         target_thrust = 10  # kN
     )
     # NASA_CEA().cea_print_full(NASA_CEA().cea_rocket_solver(R2S_ENGINE))
-
     mr_array: list[float] = list(np.arange(1, 8.1, 0.1))
-    pc_array = [20.0, 25.0, 30.0, 35.0, 40.0]
+    pc_array = [14.8, 20.0, 25.0, 30.0, 35.0, 40.0]
     pc_and_mr_effect(pc_array, mr_array, R2S_ENGINE)
+    plt.show()
 
 if __name__ == "__main__":
     main()
