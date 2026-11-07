@@ -6,7 +6,6 @@ import numpy as np
 
 from engine import Engine
 from nasa_cea import NASA_CEA
-import nasa_cea
 from plotter import PlotData, Plotter
 
 
